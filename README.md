@@ -75,4 +75,7 @@ aws cloudformation deploy \
 1. Lege eine neue Workflow-Datei an in .github/workflows
 2. In der Pipeline soll immer das aktuelle Backend und die docker compose Datei auf die EC2-Instanz gepushed werden.
 3. Die Pipeline braucht dazu dann natürlich den privaten SSH Key, den EC2-User und den Hostnamen (IP-Adresse) fürs Kopieren per SCP
-4. Testen wir das mal aus
+4. Testen wir das mal aus... läuft
+
+## Verbindung Frontend - Backend
+Damit wir das testen können müssen wir im Frontend die richtige API_URL fetchen. Hol dir also wieder die öffentliche IP der EC2-Instanz und füg die ein. z.B. http://3.122.247.91:3000/users"
