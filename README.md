@@ -71,4 +71,8 @@ aws cloudformation deploy \
 ### Docker Compose File anlegen
 1. Lege ein docker-compose.yml im Repo an
 2. Committe den aktuellen Stand
-###
+### CICD-Pipeline fürs Backend
+1. Lege eine neue Workflow-Datei an in .github/workflows
+2. In der Pipeline soll immer das aktuelle Backend und die docker compose Datei auf die EC2-Instanz gepushed werden.
+3. Die Pipeline braucht dazu dann natürlich den privaten SSH Key, den EC2-User und den Hostnamen (IP-Adresse) fürs Kopieren per SCP
+4. Testen wir das mal aus
