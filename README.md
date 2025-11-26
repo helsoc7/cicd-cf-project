@@ -1,5 +1,5 @@
 # Cloudformation und CICD-Automatisierung für AWS-Deployment
-## Anleitung
+## Anleitung - Frontend
 ### Projekt anlegen
 Lege dir ein neues Projekt an mit den Ordnern
 - infra: Hier kommt das Cloudformation-Template rein
@@ -38,3 +38,37 @@ aws cloudformation deploy \
 1. Navigiere in den CloudFront-Service und geh auf den gerade erstellten
 2. Kopiere die Distribution domain name und gib ihn in einem neuen Browser-Fenster ein
 3. Du solltest nun dein Frontend sehen... 
+
+## Anleitung - Backend
+Für das Backend wollen wir eine EC2-Instanz per CloudFormation Stack erstellen und ihr einen selbst erstellten SSH-Key zuordnen, damit wir uns aus der Pipeline mit der Instanz verbinden können und die aktuelle docker-compose-Datei hochladen können. Ziel der Geschichte ist es, dass Backend und eine Datenbank mit Volume in einem Docker Compose Konstrukt auf der EC2-Instanz laufen sollen.
+**Achtung** Wir kopieren uns noch eben den Code des Backends rüber inkl. Dockerfile. Das ist ein einfaches Flask-Backend
+### SSH-Key lokal erstellen
+1. Erzeuge dir über das Terminal einen SSH-Key
+```bash
+ssh-keygen -t rsa -b 4096 -C "backend-deploy"
+```
+Beim Dateinamen antworte bitte mit dem kompletten Pfad, häng aber hinten ein id_rsa_backend an
+2. Navigier in das .ssh Verzeichnis auf deinem User-Verzeichnis rein
+3. Da sehen wir haben wir einen öffentlichen und einen privaten Key vom erzeugten SSH-Schlüssel. 
+Der Private Key kommt als Github Secret ins Repo
+```bash
+cat ~/.ssh/id_rsa_backend
+```
+**Achtung** Der öffentliche Schlüssel kommt nachher auf die EC2-Instanz per CloudFormation Stack
+### Cloudformation Template fürs Backend
+1. Lege ein template fürs Backend-Deployment an
+2. Danach deploye das mit dem folgenden Befehl
+```bash
+aws cloudformation deploy \
+  --template-file infra/backend.yaml \
+  --stack-name backend-stack \
+  --parameter-overrides SshPublicKey="$(cat ~/.ssh/id_rsa_backend.pub)" \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+3. Wir müssen noch die Public Ip der Instanz als Github Secret anlegen. Außerdem noch den EC2-User...
+- EC2_USER = ec2-user
+- EC2_HOST = bekommen wir raus mit `aws cloudformation describe-stacks --stack-name backend-stack` z.B. 18.192.119.206
+### Docker Compose File anlegen
+1. Lege ein docker-compose.yml im Repo an
+2. Committe den aktuellen Stand
+###

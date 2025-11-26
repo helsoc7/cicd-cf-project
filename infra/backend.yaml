@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EC2 instance for backend with Docker and SSH access
+
+Parameters:
+  SshPublicKey:
+    Type: String
+    Description: Public SSH key for EC2 access
+
+Resources:
+  BackendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH and backend port
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          CidrIp: 0.0.0.0/0
+
+  BackendInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: ami-0a6793a25df710b06
+      SecurityGroupIds:
+        - !Ref BackendSecurityGroup
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          amazon-linux-extras install docker -y
+          systemctl enable docker
+          systemctl start docker
+
+          # Docker Compose installieren
+          curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" \
+            -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+
+          # SSH Key hinzufügen
+          mkdir -p /home/ec2-user/.ssh
+          echo "${SshPublicKey}" >> /home/ec2-user/.ssh/authorized_keys
+          chmod 700 /home/ec2-user/.ssh
+          chmod 600 /home/ec2-user/.ssh/authorized_keys
+          chown -R ec2-user:ec2-user /home/ec2-user/.ssh
+
+          usermod -aG docker ec2-user
+
+Outputs:
+  BackendPublicIp:
+    Value: !GetAtt BackendInstance.PublicIp
+
+  BackendPublicDns:
+    Value: !GetAtt BackendInstance.PublicDnsName

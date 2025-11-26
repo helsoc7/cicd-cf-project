@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: exampledb
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST=db
+      DB_USER=root
+      DB_PASSWORD=example
+      DB_NAME=exampledb
+    depends_on:
+      - db
+
+volumes:
+  db_data:
