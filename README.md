@@ -79,3 +79,50 @@ aws cloudformation deploy \
 
 ## Verbindung Frontend - Backend
 Damit wir das testen können müssen wir im Frontend die richtige API_URL fetchen. Hol dir also wieder die öffentliche IP der EC2-Instanz und füg die ein. z.B. http://3.122.247.91:3000/users"
+Pushen und testen..
+
+**Achtung** Wir bekommen Mixed Content Problem. Das bedeutet, dass das Frontend über HTTPS ausgeliefert wird, aber intern per HTTP die Daten vom Backend holen möchte.. das möchten die modernen Browser nicht aus Sicherheitsgründen! Daher müssen wir das Backend über HTTPS ausliefern. Da gibt es verschiedene Möglichkeiten.. Wir können vor die EC2-Instanz einen ALB davor schalten. Oder aber wir bauen einen NGINX Ingress Controller ein... Aber ne.. Wir nutzen eine simple Lösung mit dem API Gateway Service von AWS. 
+## Anleitung - API Gateway
+### API Gateway Cloudformation Template
+1. Wir bauen uns ein Cloudformation Template fürs API Gateway
+2. Beim Deployen des Templates brauchen wir die IP des Backends.. z.B. http://3.122.247.91:3000/users
+3. Deployen mit
+```bash
+aws cloudformation deploy \
+  --template-file infra/api-gateway.yaml \
+  --stack-name backend-api-gateway \
+  --parameter-overrides BackendUrl="http://3.122.247.91:3000" \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+4. Danach können wir die Backend URL herausfinden mit 
+```bash
+aws cloudformation describe-stacks \
+  --stack-name backend-api-gateway \
+  --query "Stacks[0].Outputs" '
+  ```
+
+5. Das wieder im Frontend eintragen:
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Mini Cloud Native App</title>
+  </head>
+  <body>
+    <h1>Frontend läuft</h1>
+    <button onclick="loadUsers()">Benutzer laden</button>
+    <pre id="output"></pre>
+    <script>
+        // Achtung hier muss natürlich später die Backend-IP rein... TODO
+      async function loadUsers() {
+        const res = await fetch("https://jdlxlfhcwb.execute-api.eu-central-1.amazonaws.com/prod/users");
+        const data = await res.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      }
+    </script>
+  </body>
+</html>
+
+
+```

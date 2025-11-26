@@ -11,7 +11,7 @@
     <script>
         // Achtung hier muss natürlich später die Backend-IP rein... TODO
       async function loadUsers() {
-        const res = await fetch("http://3.122.247.91:3000/users");
+        const res = await fetch("https://jdlxlfhcwb.execute-api.eu-central-1.amazonaws.com/prod/users");
         const data = await res.json();
         document.getElementById("output").textContent = JSON.stringify(data, null, 2);
       }
