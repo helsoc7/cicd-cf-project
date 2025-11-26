@@ -33,3 +33,8 @@ aws cloudformation deploy \
 ### CICD-Pipeline
 1. Erstell eine Datei in .github/workflows 
 2. Danach committen wir den Stand und schauen mal ob die Pipeline korrekt startet
+3. Scheint zu laufen
+### Kontrolle über AWS Management Konsole
+1. Navigiere in den CloudFront-Service und geh auf den gerade erstellten
+2. Kopiere die Distribution domain name und gib ihn in einem neuen Browser-Fenster ein
+3. Du solltest nun dein Frontend sehen... 
