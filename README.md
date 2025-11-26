@@ -17,3 +17,19 @@ Als nächstes legen wir uns in der AWS Konsole einen IAM User für die Pipeline 
 - Diese Daten müssen nun als Github Secret in ein Repo
 ##### Github Repo anlegen
 - Leg dir ein neues Repo an
+- Push den bisherigen Stand
+- Lege dir Secrets an unter Settings > Secrets and Variables > Actions > New Repository Secret
+- Pack da bitte AWS_ACCESS_KEY_ID und AWS_SECRET_ACCESS_KEY rein
+### CloudFormation
+1. Wir wollen erst einmal das CloudFormation Template anlegen
+2. Den Stack wollen wir einmalig einmal deployen. CloudFront dauert tatsächlich auch ein wenig länger..
+```bash
+aws cloudformation deploy \
+  --template-file infra/template.yaml \
+  --stack-name frontend-stack \
+  --capabilities CAPABILITY_NAMED_IAM
+```
+3. Wenn das erstellt worden ist, wollen wir mit der Pipeline weiter machen. Stand jetzt haben wir ein Bucket (+ stat. Website Hosting) erstellt mit vorgeschalteten CloudFront auf AWS. Jetzt benötigen wir natürlich noch die Dateien in dem Bucket, die wir über eine CICD-Pipeline ständig uploaden bzw. updaten wollen.
+### CICD-Pipeline
+1. Erstell eine Datei in .github/workflows 
+2. Danach committen wir den Stand und schauen mal ob die Pipeline korrekt startet
