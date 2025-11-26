@@ -14,10 +14,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DB_HOST=db
-      DB_USER=root
-      DB_PASSWORD=example
-      DB_NAME=exampledb
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: example
+      DB_NAME: exampledb
     depends_on:
       - db
 
